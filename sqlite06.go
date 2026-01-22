@@ -69,7 +69,7 @@ func exists(username string) int {
 // -1 if there was an error
 
 func AddUser(d Userdata) int {
-	d.Username = strings.ToLower(strings.TrimSpace(d.Username))
+	d.Username = strings.ToLower(d.Username)
 	db, err := openConnection()
 	if err != nil {
 		fmt.Println(err)
@@ -81,8 +81,8 @@ func AddUser(d Userdata) int {
 		fmt.Println("User already exists: ", d.Username)
 		return -1
 	}
-	insertStatment := `INSERT INTO Users values (Null , ?)`
-	_, err = db.Exec(insertStatment, d.Username)
+	insertStatement := `INSERT INTO Users values (NULL , ?)`
+	_, err = db.Exec(insertStatement, d.Username)
 	if err != nil {
 		fmt.Println(err)
 		return -1
@@ -92,8 +92,8 @@ func AddUser(d Userdata) int {
 		return userId
 	}
 
-	insertStatment = `INSERT INTO Userdata values (?,?,?,?,?)`
-	_, err = db.Exec(insertStatment, userId, d.Username, d.Username, d.Name, d.Description)
+	insertStatement = `INSERT INTO Userdata values (?,?,?,?)`
+	_, err = db.Exec(insertStatement, userId, d.Name, d.Surname, d.Description)
 	if err != nil {
 		fmt.Println("db.Exec()", err)
 		return -1
@@ -111,6 +111,7 @@ func DeleteUser(id int) error {
 	defer db.Close()
 
 	statement := fmt.Sprintf(`SELECT Username FROM Users WHERE ID = %d`, id)
+
 	rows, err := db.Query(statement)
 	var username string
 	for rows.Next() {
@@ -147,7 +148,8 @@ func ListUsers() ([]Userdata, error) {
 
 	defer db.Close()
 
-	rows, err := db.Query(`SELECT ID, Username, Name, Surname, Description FROM Users , Userdata WHERE Users.ID = Userdata.ID`)
+	rows, err := db.Query(`SELECT ID, Username, Name, Surname, Description 
+FROM Users , Userdata WHERE Users.ID = Userdata.UserID`)
 	defer rows.Close()
 	if err != nil {
 		return Data, err
@@ -182,7 +184,7 @@ func UpdateUser(d Userdata) error {
 		return errors.New("User does not exist")
 	}
 	d.ID = userId
-	updateStatement := `UPDATE Userdata set Name = ?, Surname = ?, Description = ? where ID = ?`
+	updateStatement := `UPDATE Userdata set Name = ?, Surname = ?, Description = ? where UserID = ?`
 	_, err = db.Exec(updateStatement, d.Name, d.Surname, d.Description, d.ID)
 	if err != nil {
 		return err
