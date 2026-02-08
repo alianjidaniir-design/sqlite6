@@ -33,7 +33,7 @@ func openConnection() (*sql.DB, error) {
 }
 
 //the function return the User ID of the username
-// -1 if the user does not  exist
+// a1 if the user does not  exist
 
 func exists(username string) int {
 	username = strings.ToLower(username)
@@ -64,9 +64,9 @@ func exists(username string) int {
 
 }
 
-//Adduser adds a new user to the database
+//Adduser adds a new user to the database.go
 // Return new User ID
-// -1 if there was an error
+// a1 if there was an error
 
 func AddUser(d Userdata) int {
 	d.Username = strings.ToLower(d.Username)
